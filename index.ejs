@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Quiz Entry</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          animation: {
+            fadeInUp: "fadeInUp 1s ease-out",
+            pulseSlow: "pulse 4s infinite",
+            float: "float 6s ease-in-out infinite",
+          },
+          keyframes: {
+            fadeInUp: {
+              '0%': { opacity: 0, transform: 'translateY(30px)' },
+              '100%': { opacity: 1, transform: 'translateY(0)' }
+            },
+            float: {
+              '0%, 100%': { transform: 'translateY(0)' },
+              '50%': { transform: 'translateY(-10px)' }
+            }
+          },
+          colors: {
+            primary: '#4f46e5',
+            secondary: '#ec4899',
+          },
+          boxShadow: {
+            glow: "0 0 15px rgba(79, 70, 229, 0.5)",
+            softGlow: "0 0 40px rgba(79, 70, 229, 0.25)"
+          }
+        }
+      }
+    };
+  </script>
+  <link rel="stylesheet" href="https://unpkg.com/@fortawesome/fontawesome-free/css/all.css" />
+</head>
+<body class="bg-gradient-to-br from-slate-100 via-white to-blue-100 text-gray-800 min-h-screen flex items-center justify-center relative overflow-hidden font-sans">
+
+  <!-- Subtle Animated Background Orbs -->
+  <div class="absolute top-0 left-0 w-full h-full z-0 overflow-hidden pointer-events-none">
+    <div class="absolute bg-indigo-300 opacity-10 w-80 h-80 rounded-full top-12 left-12 animate-float blur-3xl"></div>
+    <div class="absolute bg-blue-300 opacity-10 w-96 h-96 rounded-full bottom-16 right-16 animate-float blur-3xl"></div>
+  </div>
+
+  <div class="relative z-10 bg-white text-gray-800 p-10 rounded-3xl shadow-softGlow w-full max-w-md border border-gray-200 animate-fadeInUp backdrop-blur-lg">
+    <h1 class="text-3xl font-bold mb-6 text-center text-primary">🎯 Enter Quiz Details</h1>
+
+    <form id="quiz-form" action="/start-quiz" method="POST" class="space-y-5" onsubmit="return validatePseudo(event);">
+      
+      <!-- Name -->
+      <div class="relative">
+        <input type="text" name="name" placeholder="Your Name" required class="w-full p-3 pl-10 rounded-lg border border-gray-300 focus:ring-2 focus:ring-primary focus:outline-none transition" />
+        <i class="fas fa-user absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+      </div>
+
+      <!-- USN -->
+      <div class="relative">
+        <input type="text" name="usn" placeholder="USN" required class="w-full p-3 pl-10 rounded-lg border border-gray-300 focus:ring-2 focus:ring-primary focus:outline-none transition" />
+        <i class="fas fa-id-card absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+      </div>
+
+      <!-- Pseudonym + Generate Button -->
+      <div class="relative">
+        <input type="text" id="pseudo" name="pseudo" placeholder="Pseudonym" required class="w-full p-3 pl-10 pr-28 rounded-lg border border-gray-300 focus:ring-2 focus:ring-primary focus:outline-none transition" />
+        <i class="fas fa-user-secret absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+        <button type="button" onclick="generateAndCheckPseudo()" class="absolute right-2 top-1/2 transform -translate-y-1/2 text-xs bg-primary text-white px-3 py-1.5 rounded hover:bg-indigo-700 shadow transition">
+          Generate
+        </button>
+      </div>
+      <p id="pseudo-status" class="text-sm mt-1 text-red-600 hidden">Pseudonym already taken. Try again.</p>
+
+      <!-- Branch -->
+      <div class="relative">
+        <input type="text" name="branch" placeholder="Branch" required class="w-full p-3 pl-10 rounded-lg border border-gray-300 focus:ring-2 focus:ring-primary focus:outline-none transition" />
+        <i class="fas fa-code-branch absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+      </div>
+
+      <!-- Section -->
+      <div class="relative">
+        <input type="text" name="section" placeholder="Section" required class="w-full p-3 pl-10 rounded-lg border border-gray-300 focus:ring-2 focus:ring-primary focus:outline-none transition" />
+        <i class="fas fa-layer-group absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+      </div>
+
+      <button type="submit" class="bg-gradient-to-r from-primary to-secondary text-white font-semibold py-3 px-4 rounded-lg w-full hover:from-indigo-700 hover:to-pink-600 shadow-lg transform hover:scale-105 transition duration-300">
+        🚀 Start Quiz
+      </button>
+    </form>
+  </div>
+
+  <!-- Scripts -->
+  <script>
+    async function generateAndCheckPseudo() {
+      try {
+        const res = await fetch('/generate-pseudo');
+        const data = await res.json();
+        const pseudo = data.pseudo;
+        document.getElementById('pseudo').value = pseudo;
+
+        const checkRes = await fetch(`/check-pseudo?pseudo=${pseudo}`);
+        const checkData = await checkRes.json();
+
+        const status = document.getElementById('pseudo-status');
+        if (checkData.exists) {
+          status.textContent = 'Pseudonym already taken. Try again.';
+          status.classList.remove('hidden');
+        } else {
+          status.classList.add('hidden');
+        }
+      } catch (err) {
+        console.error('Error during pseudonym generation or check:', err);
+      }
+    }
+
+    async function validatePseudo(event) {
+      event.preventDefault();
+
+      const pseudo = document.getElementById('pseudo').value.trim();
+      const status = document.getElementById('pseudo-status');
+
+      if (!pseudo) {
+        status.textContent = 'Please enter a pseudonym.';
+        status.classList.remove('hidden');
+        return false;
+      }
+
+      try {
+        const res = await fetch(`/check-pseudo?pseudo=${pseudo}`);
+        const data = await res.json();
+
+        if (data.exists) {
+          status.textContent = 'Pseudonym already taken. Please choose a different one.';
+          status.classList.remove('hidden');
+          return false;
+        } else {
+          status.classList.add('hidden');
+          document.getElementById('quiz-form').submit();
+        }
+      } catch (err) {
+        console.error('Error checking pseudonym:', err);
+        status.textContent = 'Something went wrong. Please try again.';
+        status.classList.remove('hidden');
+      }
+
+      return false;
+    }
+  </script>
+</body>
+</html>
