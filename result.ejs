@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Quiz Result</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          animation: {
+            fadeInUp: "fadeInUp 1s ease-out",
+            pulseSlow: "pulse 4s infinite",
+          },
+          keyframes: {
+            fadeInUp: {
+              '0%': { opacity: 0, transform: 'translateY(40px)' },
+              '100%': { opacity: 1, transform: 'translateY(0)' }
+            }
+          },
+          boxShadow: {
+            glow: "0 0 20px rgba(99, 102, 241, 0.6)"
+          }
+        }
+      }
+    };
+  </script>
+</head>
+<body class="bg-gradient-to-br from-indigo-600 via-purple-700 to-pink-600 min-h-screen flex items-center justify-center">
+
+  <div class="bg-white rounded-3xl shadow-glow p-10 max-w-lg w-full text-center border-4 border-transparent animate-fadeInUp" style="border-image: linear-gradient(135deg, #6366f1, #ec4899) 1;">
+
+    <div class="text-5xl mb-4 text-yellow-400 animate-bounce">
+      🏆
+    </div>
+
+    <h2 class="text-3xl font-bold text-indigo-700 mb-2">Well done, <%= pseudo %>!</h2>
+
+    <p class="text-lg mb-1 text-gray-800">Your Score: <span class="font-bold text-indigo-600"><%= score %></span></p>
+    <p class="text-lg mb-4 text-gray-800">Your Rank: <span class="font-bold text-indigo-600">#<%= rank %></span></p>
+
+    <!-- Motivational Message -->
+    <div class="mb-6">
+      <% if (score === quizQuestions.length) { %>
+        <p class="text-xl font-semibold text-indigo-600">💯 Perfect Score! You're a quiz master!</p>
+      <% } else if (score >= quizQuestions.length * 0.7) { %>
+        <p class="text-xl font-semibold text-indigo-500">👏 Great job! Keep aiming higher!</p>
+      <% } else if (score >= quizQuestions.length * 0.4) { %>
+        <p class="text-xl font-semibold text-yellow-500">✨ Good effort! You’re getting there!</p>
+      <% } else { %>
+        <p class="text-xl font-semibold text-red-500">💪 Don’t give up — every pro was once a beginner!</p>
+      <% } %>
+    </div>
+
+    <p class="text-sm text-gray-500 mb-6">This result is private and visible only to you.</p>
+
+    <a href="/leaderboard" class="inline-block bg-gradient-to-r from-indigo-500 to-purple-600 text-white px-5 py-2 rounded-lg font-semibold hover:from-indigo-600 hover:to-purple-700 transition shadow-md">
+      View Leaderboard
+    </a>
+  </div>
+
+  <!-- Confetti animation on load -->
+  <script>
+    confetti({
+      particleCount: 120,
+      spread: 100,
+      origin: { y: 0.6 }
+    });
+  </script>
+</body>
+</html>
