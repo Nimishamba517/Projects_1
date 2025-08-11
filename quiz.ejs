@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Quiz</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    let timeLeft = 60;
+    setInterval(() => {
+      if (timeLeft <= 0) return;
+      document.getElementById("timer").innerText = --timeLeft + "s";
+    }, 1000);
+  </script>
+</head>
+<body class="bg-gray-100 min-h-screen p-8">
+  <div class="max-w-2xl mx-auto bg-white p-6 rounded shadow">
+    <div class="flex justify-between items-center mb-4">
+      <h2 class="text-xl font-bold">Welcome, <%= student.pseudo %></h2>
+      <div class="text-red-600 font-semibold">Time left: <span id="timer">60s</span></div>
+    </div>
+    <form action="/submit-quiz" method="POST">
+      <input type="hidden" name="name" value="<%= student.name %>" />
+      <input type="hidden" name="usn" value="<%= student.usn %>" />
+      <input type="hidden" name="pseudo" value="<%= student.pseudo %>" />
+      <input type="hidden" name="branch" value="<%= student.branch %>" />
+      <input type="hidden" name="section" value="<%= student.section %>" />
+
+      <% quizQuestions.forEach((q, idx) => { %>
+        <div class="mb-4">
+          <p class="font-semibold mb-2"><%= idx + 1 %>. <%= q.question %></p>
+          <% q.options.forEach(opt => { %>
+            <label class="block">
+              <input type="radio" name="q<%= idx %>" value="<%= opt %>" required class="mr-2" />
+              <%= opt %>
+            </label>
+          <% }) %>
+        </div>
+      <% }) %>
+
+      <button type="submit" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded mt-4">Submit Quiz</button>
+    </form>
+  </div>
+</body>
+</html>
