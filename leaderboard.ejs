@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Leaderboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      @keyframes pop-in {
+        0% {
+          transform: scale(0.5);
+          opacity: 0;
+        }
+        100% {
+          transform: scale(1);
+          opacity: 1;
+        }
+      }
+
+      .animate-pop-in {
+        animation: pop-in 0.6s ease-out forwards;
+      }
+
+      .delay-0 { animation-delay: 0s; }
+      .delay-1 { animation-delay: 0.1s; }
+      .delay-2 { animation-delay: 0.2s; }
+      .delay-3 { animation-delay: 0.3s; }
+      .delay-4 { animation-delay: 0.4s; }
+
+      /* Card Hover Effect */
+      .card-shadow {
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1), 0 6px 20px rgba(0, 0, 0, 0.1);
+      }
+
+      .card-hover:hover {
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15), 0 12px 30px rgba(0, 0, 0, 0.1);
+        transform: translateY(-5px);
+      }
+
+      /* Gradient colors for ranking */
+      .gold { background: linear-gradient(45deg, #f1c40f, #f39c12); }
+      .silver { background: linear-gradient(45deg, #bdc3c7, #95a5a6); }
+      .bronze { background: linear-gradient(45deg, #e67e22, #d35400); }
+      .default { background: linear-gradient(45deg, #8e44ad, #9b59b6); }
+    </style>
+  </head>
+  <body class="bg-gradient-to-br from-indigo-300 via-purple-300 to-pink-400 min-h-screen py-10 px-6">
+
+    <div class="max-w-3xl mx-auto bg-white rounded-lg shadow-lg p-8 card-shadow">
+      <h1 class="text-4xl font-extrabold text-center text-indigo-700 mb-6">
+        📊 Quiz Leaderboard
+      </h1>
+
+      <% if (leaderboard.length === 0) { %>
+        <p class="text-center text-gray-500">No submissions yet.</p>
+      <% } else { %>
+        <ul>
+          <% leaderboard.forEach((entry, i) => { %>
+            <!-- Dynamically apply delay class and custom background color -->
+            <li class="bg-white shadow-md rounded-md p-5 mb-4 animate-pop-in card-hover <%= 'delay-' + i %> <%= i === 0 ? 'gold' : i === 1 ? 'silver' : i === 2 ? 'bronze' : 'default' %>">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-3">
+                  <!-- Ranking Emojis with Colors -->
+                  <% if (i === 0) { %>
+                    <span class="text-5xl text-yellow-500">🏅</span>
+                    <span class="text-xl font-semibold text-white"><%= entry.pseudo %> (1st)</span>
+                  <% } else if (i === 1) { %>
+                    <span class="text-5xl text-gray-400">🥈</span>
+                    <span class="text-xl font-semibold text-white"><%= entry.pseudo %> (2nd)</span>
+                  <% } else if (i === 2) { %>
+                    <span class="text-5xl text-orange-500">🥉</span>
+                    <span class="text-xl font-semibold text-white"><%= entry.pseudo %> (3rd)</span>
+                  <% } else { %>
+                    <span class="text-4xl text-indigo-600">#<%= i + 1 %></span>
+                    <span class="text-xl font-semibold text-indigo-800"><%= entry.pseudo %></span>
+                  <% } %>
+                </div>
+                <div>
+                  <p class="text-lg font-bold text-white">Score: <%= entry.score %></p>
+                </div>
+              </div>
+            </li>
+          <% }); %>
+        </ul>
+      <% } %>
+
+      <div class="text-center mt-6">
+        <a href="/" class="inline-block bg-indigo-600 text-white px-6 py-2 rounded-full shadow-md hover:bg-indigo-700 transition duration-300">
+          🔙 Back to Home
+        </a>
+      </div>
+    </div>
+  </body>
+</html>
